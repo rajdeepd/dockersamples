@@ -1,27 +1,28 @@
 package sampleutils
 
 import (
-    "encoding/json"
-    "fmt"
-    "os"
-    "bytes"
-    "io/ioutil"
-    "net"
-    "net/http"
-    "net/http/httputil"
-    "path/filepath"
-    "time"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"path/filepath"
+	"time"
 )
+
 type ResponseJSON []struct {
-       Names []string
-       Id string
-       Created float64
+	Names   []string
+	Id      string
+	Created float64
 }
 
 type ResponseCreateContainer struct {
-       Id string
-       Warnings string
+	Id       string
+	Warnings string
 }
+
 func SockRequest(method, endpoint string, data interface{}) ([]byte, error) {
 	sock := filepath.Join("/", "var", "run", "docker.sock")
 	c, err := net.DialTimeout("unix", sock, time.Duration(10*time.Second))
@@ -56,21 +57,15 @@ func SockRequest(method, endpoint string, data interface{}) ([]byte, error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
-func PrettyPrint(responseJSON *ResponseJSON)() {
-    response, err := json.MarshalIndent(responseJSON, "", "  ")
-    if err != nil {
-       panic(err)
-    }
-    responseNewLine := append(response, '\n')
-    os.Stdout.Write(responseNewLine)
+func toJson(object interface{}) string {
+	response, err := json.MarshalIndent(object, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+
+	return string(response)
 }
 
-func PrettyPrintTwo(responseCC *ResponseCreateContainer)() {
-    response, err := json.MarshalIndent(responseCC, "", "  ")
-    if err != nil {
-       panic(err)
-    }
-    responseNewLine := append(response, '\n')
-    os.Stdout.Write(responseNewLine)
+func PrettyPrint(object interface{}) {
+	fmt.Println(toJson(object))
 }
-
