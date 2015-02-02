@@ -62,7 +62,7 @@ func main() {
                 startContainer(name)
             }
         } else if i == 5 {
-            fmt.Printf("Show Container process\n")
+            fmt.Printf("Show Container processes\n")
             if len(os.Args) != 3 {
                 fmt.Println("Please specify container name after 5")
             } else {
@@ -73,10 +73,10 @@ func main() {
             fmt.Printf("Pause the Container\n")
             if len(os.Args) != 3 {
                 fmt.Println("Please specify container name after 6")
-                                       } else {
-                                           name := os.Args[2]
-                                           pauseContainer(name)
-                                       }
+            } else {
+                name := os.Args[2]
+                pauseContainer(name)
+            }
         } else if i == 7 {
             fmt.Printf("Get Container State\n")
             if len(os.Args) != 3 {
@@ -86,9 +86,18 @@ func main() {
                 containerState := getContainerState(name)
                 fmt.Println("Returned State: %#v \n", containerState)
             }
-       } else {
-         fmt.Printf("Please specify valid test no as a command line argument\n")
-       }
+        } else if i == 8 {
+            fmt.Printf("Unpause a Container\n")
+            if len(os.Args) != 3 {
+                fmt.Println("Please specify container name after 6")
+            } else {
+                name := os.Args[2]
+                unpauseContainer(name)
+                //fmt.Println("Returned State: %#v \n", containerState)
+            }
+        }else {
+            fmt.Printf("Please specify valid test no as a command line argument\n")
+        }
     } else {
          fmt.Printf("Please specify valid test no as a command line argument\n")
          help := "0        : getContainers\n" +
@@ -98,15 +107,14 @@ func main() {
                  "4 [name] : StartContainer\n" +
                  "5 [name] : List Processes\n" +
                  "6 [name] : Pause Container\n" +
-                 "7 [name] : Get Container State\n"
+                 "7 [name] : Get Container State\n" +
+                 "8 [name] : Unpause Container\n"
          fmt.Printf("%v", help)
-
     }
 }
 
 func getContainers() {
     body, err := sampleutils.SockRequest("GET", "/containers/json?all=1", nil)
-
     var respJSON *sampleutils.ResponseJSON
     if err = json.Unmarshal(body, &respJSON); err != nil {
        fmt.Printf("unable to unmarshal response body: %v", err)
