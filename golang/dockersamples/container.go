@@ -135,7 +135,7 @@ func createContainer(name string) {
     if err = json.Unmarshal(body, &resp); err != nil {
        fmt.Printf("unable to unmarshal response body: %v", err)
     }
-    sampleutils.PrettyPrintTwo(resp)
+    sampleutils.PrettyPrint(resp)
 }
 
 func containerExists(name string) (b bool) {
