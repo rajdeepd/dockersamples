@@ -3,7 +3,6 @@ package sampleutils
 import (
     "encoding/json"
     "fmt"
-    "os"
     "bytes"
     "io/ioutil"
     "net"
@@ -56,21 +55,15 @@ func SockRequest(method, endpoint string, data interface{}) ([]byte, error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
-func PrettyPrint(responseJSON *ResponseJSON)() {
-    response, err := json.MarshalIndent(responseJSON, "", "  ")
+func toJson(object interface {}) string {
+    response, err := json.MarshalIndent(object, "", "  ")
     if err != nil {
-       panic(err)
+        panic(err)
     }
-    responseNewLine := append(response, '\n')
-    os.Stdout.Write(responseNewLine)
+
+    return string(response)
 }
 
-func PrettyPrintTwo(responseCC *ResponseCreateContainer)() {
-    response, err := json.MarshalIndent(responseCC, "", "  ")
-    if err != nil {
-       panic(err)
-    }
-    responseNewLine := append(response, '\n')
-    os.Stdout.Write(responseNewLine)
+func PrettyPrint(object interface {})() {
+    fmt.Println(toJson(object))
 }
-
