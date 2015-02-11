@@ -125,6 +125,7 @@ func getContainers() {
 func createContainer(name string) {
     config := map[string]interface{}{
        "Image": "busybox",
+       "OpenStdin": true,
     }
     body, err := sampleutils.SockRequest("POST", "/containers/create?name="+name, config)
     if err != nil  {
