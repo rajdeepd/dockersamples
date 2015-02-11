@@ -3,10 +3,16 @@ package main
 import (
     "fmt"
     "encoding/json"
+    "errors"
     "os"
     "github.com/rajdeepd/dockersamples/golang/dockersamples/sampleutils"
     "strconv"
 )
+
+type ContainerInfo struct {
+    Names []string
+    Id string
+}
 
 func main() {
     if len(os.Args) >= 2 {
@@ -139,77 +145,55 @@ func createContainer(name string) {
     sampleutils.PrettyPrint(resp)
 }
 
-func containerExists(name string) (b bool) {
-    body, err := sampleutils.SockRequest("GET", "/containers/json?all=1", nil)
-    var inspectJSON []struct {
-       Names []string
-    }
-     if err = json.Unmarshal(body, &inspectJSON); err != nil {
-    	fmt.Printf("unable to unmarshal response body: %v", err)
-    }
-    containerExists := false
+func getContainerInfoFor(name string, inspectJSON []ContainerInfo) (ContainerInfo, error) {
     var noOfContainers = len(inspectJSON)
     for i := 0; i < noOfContainers; i++ {
-       nameLocal := inspectJSON[i].Names[0]
-       name_trimmed := nameLocal[1:len(nameLocal)]
-       if name_trimmed == name {
-           containerExists := true
-           return containerExists
-       }
+        nameLocal := inspectJSON[i].Names[0]
+        name_trimmed := nameLocal[1:len(nameLocal)]
+        if name_trimmed == name {
+            return inspectJSON[i], nil
+        }
     }
-    return containerExists
+
+    var value ContainerInfo
+
+    return value, errors.New("No container information found for " + name)
+}
+
+func containerExists(name string) (b bool) {
+    body, err := sampleutils.SockRequest("GET", "/containers/json?all=1", nil)
+
+    var inspectJSON []ContainerInfo
+    if err = json.Unmarshal(body, &inspectJSON); err != nil {
+    	fmt.Printf("unable to unmarshal response body: %v", err)
+    }
+
+    _, err = getContainerInfoFor(name, inspectJSON)
+
+    return err == nil
 }
 
 func printContainerId(name string) () {
-    body, err := sampleutils.SockRequest("GET", "/containers/json?all=1", nil)
-    var inspectJSON []struct {
-       Names []string
-       Id string
-    }
-     if err = json.Unmarshal(body, &inspectJSON); err != nil {
-    	fmt.Printf("unable to unmarshal response body: %v", err)
-    }
-    containerExists := false
-    var noOfContainers = len(inspectJSON)
-    for i := 0; i < noOfContainers; i++ {
-       nameLocal := inspectJSON[i].Names[0]
-       name_trimmed := nameLocal[1:len(nameLocal)]
-       if name_trimmed == name {
-           containerExists = true
-           containerId := inspectJSON[i].Id
-           fmt.Printf("Container Id : %v", containerId)
-       }
-    }
-    if containerExists == false {
-        fmt.Printf("Container %v doesn't exist\n", name)
-    }
+    fmt.Printf("Container Id : %v\n", getContainerId(name))
 }
 
 func getContainerId(name string) (id string) {
-        containerId := ""
-        body, err := sampleutils.SockRequest("GET", "/containers/json?all=1", nil)
-        var inspectJSON []struct {
-           Names []string
-           Id string
-        }
-         if err = json.Unmarshal(body, &inspectJSON); err != nil {
-        	fmt.Printf("unable to unmarshal response body: %v", err)
-        }
-        //containerExists := false
-        var noOfContainers = len(inspectJSON)
-        for i := 0; i < noOfContainers; i++ {
-           nameLocal := inspectJSON[i].Names[0]
-           name_trimmed := nameLocal[1:len(nameLocal)]
-           fmt.Printf("name %v\n", name)
-           fmt.Printf("name_trimmed %v\n", name_trimmed)
-           if name_trimmed == name {
-               containerId := inspectJSON[i].Id
-               fmt.Printf("Container Id : %v", containerId)
-               return containerId
-           }
-        }
-        return containerId
+    containerId := ""
+    body, err := sampleutils.SockRequest("GET", "/containers/json?all=1", nil)
+    var inspectJSON []ContainerInfo
+
+    if err = json.Unmarshal(body, &inspectJSON); err != nil {
+        fmt.Printf("unable to unmarshal response body: %v", err)
     }
+
+    container, err := getContainerInfoFor(name, inspectJSON)
+
+    if err == nil {
+        containerId = container.Id
+    }
+
+    return containerId
+}
 
 func startContainer(name string) () {
         containerId := getContainerId(name)
