@@ -31,12 +31,31 @@ def getcontainers():
 	containers_list = json.loads(response)
 	return [Container(**container_dict) for container_dict in containers_list]
 
+def __searchbyname(name, containers):
+	for container in containers:
+		if name in container.Names:
+			return container.Id
+
+	return None
+
+def __searchbyid(containerid, containers):
+	for container in containers:
+		if fixed_name in container.Names:
+			return container.Names
+
+	return None
+
 def getcontainerid(name):
 	fixed_name = "/" + name
 	containers = getcontainers()
-	for container in containers:
-		if fixed_name in container.Names:
-			return container.Id
+	return __searchbyname(fixed_name, containers)
+
+def containerexists(name = None, containerid = None):
+	containers = getcontainers()
+	if name != None:
+		return (__searchbyname("/" + name, containers) != None)
+	elif containerid != None:
+		return (__searchbyid(containerid, containers) != None)
 
 	return None
 
@@ -48,3 +67,5 @@ if __name__ == "__main__":
 	cid = getcontainerid("berserk_colden")
 	if not cid:
 		print "No such container found."
+
+	print containerexists("berserk_colden")
