@@ -45,3 +45,10 @@ class RequestHandler:
 def printjson(jsonstr):
 	obj = json.loads(jsonstr)
 	print(json.dumps(obj, indent = 2, sort_keys = True))
+
+def paramstr_from_dict(params):
+	params_str = ""
+	for key in params.keys():
+		params_str += ("&" + key + "=" + str(params[key]))
+
+	return params_str

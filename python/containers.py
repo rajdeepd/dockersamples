@@ -10,6 +10,9 @@ class Container:
 		self.Names		(list)
 		self.Ports		(list)
 		self.Status		(str)
+
+		// Optional
+		self.SizeRw		(int)
 	"""
 
 	def __init__(self, **entries):
@@ -21,9 +24,15 @@ class Container:
 		s += (self.Command + "\t" + self.Status)
 		return s
 
-def getcontainers():
+def getcontainers(**params):
+	"""
+		Accepted parameters:
+		all, limit, since, before, size, filters, exited, status
+	"""
 	handler = utils.RequestHandler()
-	response = handler.request("GET", "/containers/json?all=1", None)
+	url_path = "/containers/json?" + utils.paramstr_from_dict(params)
+
+	response = handler.request("GET", url_path, None)
 	if handler.haserror():
 		print(response)
 		return None
@@ -60,12 +69,14 @@ def containerexists(name = None, containerid = None):
 	return None
 
 if __name__ == "__main__":
-	#jsonresponse = getcontainers()
-	#utils.printjson(jsonresponse)
-	#for item in jsonresponse:
-	#	print item, "\n"
+	containers = getcontainers(all = True, since = "4b24")
+	if containers:
+		for item in containers:
+			print item, "\n"
+	"""
 	cid = getcontainerid("berserk_colden")
 	if not cid:
 		print "No such container found."
 
 	print containerexists("berserk_colden")
+	"""
