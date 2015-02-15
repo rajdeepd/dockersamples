@@ -1,29 +1,6 @@
 import utils
 import json
 
-class Container:
-	"""
-		self.Command	(str)
-		self.Created	(int)
-		self.Id			(str)
-		self.Image		(str)
-		self.Names		(list)
-		self.Ports		(list)
-		self.Status		(str)
-
-		// Optional
-		self.SizeRw		(int)
-	"""
-
-	def __init__(self, **entries):
-		self.__dict__.update(entries)
-
-	def __str__(self):
-		s = self.Names[0].strip("/") + "\n"
-		s += self.Id[:10] + "\t" + self.Image + "\n"
-		s += (self.Command + "\t" + self.Status)
-		return s
-
 def getcontainers(**params):
 	"""
 		Accepted parameters:
@@ -37,8 +14,7 @@ def getcontainers(**params):
 		print(response)
 		return None
 
-	containers_list = json.loads(response)
-	return [Container(**container_dict) for container_dict in containers_list]
+	return json.loads(response)
 
 def __searchbyname(name, containers):
 	for container in containers:
@@ -68,11 +44,25 @@ def containerexists(name = None, containerid = None):
 
 	return None
 
+def getcontainerinfo(containerid):
+	url = "/containers/" + containerid + "/json"
+	handler = utils.RequestHandler()
+	response = handler.request("GET", url, None)
+	if handler.haserror():
+		print response
+		return None
+
+	return json.loads(response)
+
 if __name__ == "__main__":
-	containers = getcontainers(all = True, since = "4b24")
+	containers = getcontainers(all = True)
 	if containers:
 		for item in containers:
-			print item, "\n"
+			utils.printjson(json.dumps(item))
+
+	cinfo = getcontainerinfo("00731")
+	utils.printjson(obj = cinfo)
+
 	"""
 	cid = getcontainerid("berserk_colden")
 	if not cid:

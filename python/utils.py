@@ -42,8 +42,9 @@ class RequestHandler:
 	def haserror(self):
 		return (self.errno != 0 and self.errno != 200)
 
-def printjson(jsonstr):
-	obj = json.loads(jsonstr)
+def printjson(jsonstr = None, obj = None):
+	if obj == None:
+		obj = json.loads(jsonstr)
 	print(json.dumps(obj, indent = 2, sort_keys = True))
 
 def paramstr_from_dict(params):
