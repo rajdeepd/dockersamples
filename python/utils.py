@@ -17,7 +17,7 @@ class UnixHTTPConnection(httplib.HTTPConnection):
         self.sock.connect(self.sock_path)
 
 
-class RequestHandler:
+class RequestHandler(object):
     def __init__(self):
         self.err_no = 0
 
@@ -41,8 +41,8 @@ class RequestHandler:
         finally:
             conn.close()
 
-    def haserror(self):
-        return (self.errno != 0 and self.errno != 200)
+    def has_error(self):
+        return (self.err_no != 0 and self.err_no != 200)
 
 
 def printjson(jsonstr=None, obj=None):
