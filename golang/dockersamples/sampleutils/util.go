@@ -21,6 +21,12 @@ type ResponseCreateContainer struct {
        Id string
        Warnings string
 }
+
+type ContainerInfo struct {
+	Names []string
+	Id string
+}
+
 func SockRequest(method, endpoint string, data interface{}) ([]byte, error) {
 	sock := filepath.Join("/", "var", "run", "docker.sock")
 	c, err := net.DialTimeout("unix", sock, time.Duration(10*time.Second))
