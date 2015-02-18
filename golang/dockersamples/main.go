@@ -78,7 +78,7 @@ func main() {
 		} else if i == 7 {
 			fmt.Printf("Get Container State\n")
 			if len(os.Args) != 3 {
-				fmt.Println("Please specify container name after 6")
+				fmt.Println("Please specify container name after 7")
 			} else {
 				name := os.Args[2]
 				containerState := getContainerState(name)
@@ -87,10 +87,21 @@ func main() {
 		} else if i == 8 {
 			fmt.Printf("Unpause a Container\n")
 			if len(os.Args) != 3 {
-				fmt.Println("Please specify container name after 6")
+				fmt.Println("Please specify container name after 8")
 			} else {
 				name := os.Args[2]
 				unpauseContainer(name)
+				//fmt.Println("Returned State: %#v \n", containerState)
+			}
+		} else if i == 9 {
+			fmt.Printf("Start a Container with volume\n")
+			if len(os.Args) != 5 {
+				fmt.Println("Please specify container name, path of the volume in container and host path for the volume after 9")
+			} else {
+				name := os.Args[2]
+				path := os.Args[3]
+				hostPath := os.Args[4]
+				startContainerWithVolume(name, path, hostPath)
 				//fmt.Println("Returned State: %#v \n", containerState)
 			}
 		}else {
@@ -106,7 +117,8 @@ func main() {
 				"5 [name] : List Processes\n" +
 				"6 [name] : Pause Container\n" +
 				"7 [name] : Get Container State\n" +
-				"8 [name] : Unpause Container\n"
+				"8 [name] : Unpause Container\n" +
+				"9 [name] [path] [host path] : Start Container with volume\n"
 		fmt.Printf("%v", help)
 	}
 }
