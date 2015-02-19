@@ -27,7 +27,7 @@ class RequestHandler(object):
         try:
             conn = UnixHTTPConnection("/var/run/docker.sock")
             conn.connect()
-            conn.request(http_method, path, body=json.dumps(data))
+            conn.request(http_method, path, body=json.dumps(data), headers={"Content-type": "application/json"})
             response = conn.getresponse()
 
             if response.status != 200:
@@ -42,7 +42,7 @@ class RequestHandler(object):
             conn.close()
 
     def has_error(self):
-        return (self.err_no != 0 and self.err_no != 200)
+        return (self.err_no != 0 and self.err_no != 200 and self.err_no != 204)
 
 
 def printjson(jsonstr=None, obj=None):

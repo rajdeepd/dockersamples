@@ -49,14 +49,35 @@ class ContainerHandler(utils.RequestHandler):
 
         return None
 
-    def get_containerinfo(self, containerid):
-        url = "/containers/" + containerid + "/json"
+    def get_containerinfo(self, container_id):
+        url = "/containers/" + container_id + "/json"
         response = self.request("GET", url, None)
         if self.has_error():
             print response
             return None
 
         return json.loads(response)
+
+    def start_container(self, container_id):
+        url = "/containers/" + container_id + "/start"
+        response = self.request("POST", url, None)
+        if self.has_error():
+            print response
+            return False
+
+        return True
+
+    def stop_container(self, container_id, delay_in_seconds = None):
+        url = "/containers/" + container_id + "/stop"
+        if delay_in_seconds is not None:
+            url += "?t=" + str(delay_in_seconds)
+
+        response = self.request("POST", url, None)
+        if self.has_error():
+            print response
+            return False
+
+        return True
 
 
 if __name__ == "__main__":
