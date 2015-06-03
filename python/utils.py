@@ -17,7 +17,7 @@ class UnixHTTPConnection(httplib.HTTPConnection):
         self.sock.connect(self.sock_path)
 
 
-class RequestHandler:
+class RequestHandler(object):
     def __init__(self):
         self.err_no = 0
 
@@ -27,7 +27,7 @@ class RequestHandler:
         try:
             conn = UnixHTTPConnection("/var/run/docker.sock")
             conn.connect()
-            conn.request(http_method, path, body=json.dumps(data))
+            conn.request(http_method, path, body=json.dumps(data), headers={"Content-type": "application/json"})
             response = conn.getresponse()
 
             if response.status != 200:
@@ -41,13 +41,15 @@ class RequestHandler:
         finally:
             conn.close()
 
-    def haserror(self):
-        return (self.errno != 0 and self.errno != 200)
+    def has_error(self):
+        return (self.err_no != 0 and self.err_no != 200 and self.err_no != 204)
+
 
 def printjson(jsonstr=None, obj=None):
-    if obj == None:
+    if obj is None:
         obj = json.loads(jsonstr)
-    print(json.dumps(obj, indent = 2, sort_keys = True))
+    print(json.dumps(obj, indent=2, sort_keys=True))
+
 
 def paramstr_from_dict(params):
     params_str = ""
