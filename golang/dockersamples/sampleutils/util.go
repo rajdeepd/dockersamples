@@ -7,11 +7,14 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/http/httputil"
-	"os"
 	"net/url"
+	"os"
+	"path"
+	"sync"
 	"time"
 )
 
@@ -35,39 +38,34 @@ type ContainerInfo struct {
 	Id    string
 }
 
-/*func SockRequest(method, endpoint string, data interface{}) ([]byte, error) {
-	sock := filepath.Join("/", "var", "run", "docker.sock")
-	c, err := net.DialTimeout("unix", sock, time.Duration(10*time.Second))
-	if err != nil {
-		return nil, fmt.Errorf("could not dial docker sock at %s: %v", sock, err)
-	}
+// copypaste from standard math/rand
+type lockedSource struct {
+	lk  sync.Mutex
+	src rand.Source
+}
 
-	client := httputil.NewClientConn(c, nil)
-	defer client.Close()
+func NewSource() rand.Source {
+	return rand.NewSource(time.Now().UnixNano())
+	//return &lockedSource{
+	//	src: rand.NewSource(time.Now().UnixNano()),
+	//}
+}
 
-	jsonData := bytes.NewBuffer(nil)
-	if err := json.NewEncoder(jsonData).Encode(data); err != nil {
-		return nil, err
+func GenerateRandomAlphaOnlyString(n int) string {
+	// make a really long string
+	letters := []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]byte, n)
+	r := rand.New(NewSource())
+	for i := range b {
+		b[i] = letters[r.Intn(len(letters))]
 	}
+	return string(b)
+}
 
-	req, err := http.NewRequest(method, endpoint, jsonData)
-	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("could not create new request: %v", err)
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("could not perform request: %v", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		body, _ := ioutil.ReadAll(resp.Body)
-		return body, fmt.Errorf("received status != 200 OK: %s", resp.Status)
-	}
-
-	return ioutil.ReadAll(resp.Body)
-}*/
+func RandomUnixTmpDirPath(s string) string {
+	return path.Join("/tmp", fmt.Sprintf("%s.%s", s,
+		GenerateRandomAlphaOnlyString(10)))
+}
 
 func SockRequest(method, endpoint string, data interface{}) (int, []byte, error) {
 	jsonData := bytes.NewBuffer(nil)

@@ -1,11 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/rajdeepd/dockersamples/golang/dockersamples/sampleutils"
 	"os"
-        "encoding/json"
-
-        "github.com/rajdeepd/dockersamples/golang/dockersamples/sampleutils"
 )
 
 type ContainerInfo struct {
@@ -35,7 +34,6 @@ func getContainerState(name string) (containerState string) {
 			fmt.Printf("unable to unmarshal response body: %v", err)
 		}
 		containerState := string(inspectJSON.State)
-
 		return containerState
 	} else {
 		fmt.Printf("Container doesn't exist")

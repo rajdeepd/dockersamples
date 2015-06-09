@@ -14,8 +14,8 @@ type ContainerInfo struct {
 func main() {
 	if len(os.Args) > 2 {
 		name := os.Args[1]
-                action := os.Args[2]
-                if action == "pause" {
+		action := os.Args[2]
+		if action == "pause" {
 			pauseContainer(name)
 		} else if action == "unpause" {
 			unpauseContainer(name)
@@ -24,7 +24,7 @@ func main() {
 		}
 	} else {
 		fmt.Printf("Please specify container name and action on the command line\n")
-		fmt.Printf("go run dockersamples/pause_unpause_container.go [container_name] [pause|unpause]\n")       
+		fmt.Printf("go run dockersamples/pause_unpause_container.go [container_name] [pause|unpause]\n")
 	}
 }
 

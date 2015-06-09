@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"github.com/rajdeepd/dockersamples/golang/dockersamples/sampleutils"
+	"os"
 )
 
 type ContainerInfo struct {
